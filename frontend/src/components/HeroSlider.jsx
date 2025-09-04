@@ -42,7 +42,7 @@ export default function HeroSlider({ images = [], slides = [], intervalMs = 8000
         {slideList[index]?.title || slideList[index]?.text ? (
           <div
             className={
-              `absolute inset-y-6 z-10 flex ${mobileAlign === 'right' ? 'right-4 items-end' : mobileAlign === 'left' ? 'left-4 items-start' : 'left-1/2 -translate-x-1/2 items-center'} transform 
+              `absolute inset-y-6 z-10 flex hidden md:flex ${mobileAlign === 'right' ? 'right-4 items-end' : mobileAlign === 'left' ? 'left-4 items-start' : 'left-1/2 -translate-x-1/2 items-center'} transform 
               ${slideList[index]?.align === 'left' ? 'sm:left-6 sm:items-start sm:right-auto sm:translate-x-0' : 'sm:right-6 sm:items-end sm:left-auto sm:translate-x-0'}`
             }
           >
