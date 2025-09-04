@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom'
 
 export default function ServiceCard({ title, description, to, imageUrl }) {
+  const handleAttesterClick = () => {
+    // Scroll vers le haut de la page après un petit délai pour laisser le temps à la navigation
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 100)
+  }
+
   return (
     <div className="card overflow-hidden p-0">
       {imageUrl && (
@@ -11,7 +18,7 @@ export default function ServiceCard({ title, description, to, imageUrl }) {
       <div className="p-6">
         <h3 className="text-lg font-semibold mb-2 text-center text-blue-700">{title}</h3>
         <p className="text-sm text-gray-600 mb-4 text-center">{description}</p>
-        <Link to={to} className="btn-secondary w-full justify-center">
+        <Link to={to} onClick={handleAttesterClick} className="btn-secondary w-full justify-center">
           Attester {title}
         </Link>
       </div>
