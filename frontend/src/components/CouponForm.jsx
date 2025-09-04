@@ -62,7 +62,7 @@ export default function CouponForm({ type }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Civilité</label>
+          <label className="block text-sm font-medium mb-1 text-black">Civilité</label>
           <select className="w-full rounded border px-3 py-2 text-center" {...register('civility')}>
             <option>Monsieur</option>
             <option>Madame</option>
@@ -70,12 +70,12 @@ export default function CouponForm({ type }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Nom</label>
+          <label className="block text-sm font-medium mb-1 text-black">Nom</label>
           <input className="w-full rounded border px-3 py-2 text-center" {...register('lastName', { required: true, maxLength: 80 })} />
           {errors.lastName && <p className="text-sm text-red-600 mt-1">Nom requis</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Prénoms</label>
+          <label className="block text-sm font-medium mb-1 text-black">Prénoms</label>
           <input className="w-full rounded border px-3 py-2 text-center" {...register('firstName', { required: true, maxLength: 80 })} />
           {errors.firstName && <p className="text-sm text-red-600 mt-1">Prénoms requis</p>}
         </div>
@@ -83,25 +83,25 @@ export default function CouponForm({ type }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium mb-1 text-blue-700">Email</label>
+          <label className="block text-sm font-medium mb-1 text-black">Email</label>
           <input className="w-full rounded border px-3 py-2 text-center" type="email" {...register('email', { required: true, maxLength: 128 })} />
           {errors.email && <p className="text-sm text-red-600 mt-1">Email requis</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Téléphone</label>
+          <label className="block text-sm font-medium mb-1 text-black">Téléphone</label>
           <input className="w-full rounded border px-3 py-2 text-center" type="tel" {...register('phone', { maxLength: 32 })} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Pays (UE)</label>
+          <label className="block text-sm font-medium mb-1 text-black">Pays (UE)</label>
           <select className="w-full rounded border px-3 py-2 text-center" {...register('country', { required: true })}>
             {euCountries.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 text-blue-700">Nombre de coupons</label>
+          <label className="block text-sm font-medium mb-1 text-black">Nombre de coupons</label>
           <input className="w-full rounded border px-3 py-2 text-center" type="number" min={1} max={20} {...register('numCoupons', { valueAsNumber: true, min: 1, max: 20 })} />
         </div>
       </div>
@@ -115,12 +115,12 @@ export default function CouponForm({ type }) {
         {fields.map((field, index) => (
           <div key={field.id} className="grid grid-cols-1 sm:grid-cols-3 gap-4 border rounded-md p-4">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium mb-1 text-blue-700">Code coupon {index+1}</label>
+              <label className="block text-sm font-medium mb-1 text-black">Code coupon {index+1}</label>
               <input className="w-full rounded border px-3 py-2 text-center" type={hideCodes ? 'password' : 'text'} autoComplete="off" placeholder="Entrez le code" {...register(`coupons.${index}.code`, { required: true, minLength: 4 })} />
               {errors.coupons?.[index]?.code && <p className="text-sm text-red-600 mt-1">Code requis</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 text-blue-700">Montant</label>
+              <label className="block text-sm font-medium mb-1 text-black">Montant</label>
               <input className="w-full rounded border px-3 py-2 text-center" placeholder="Ex: 50" {...register(`coupons.${index}.amount`, { pattern: /^\d+(?:[\.,]\d+)?$/ })} />
               {errors.coupons?.[index]?.amount && <p className="text-sm text-red-600 mt-1">Montant invalide</p>}
             </div>
@@ -132,11 +132,6 @@ export default function CouponForm({ type }) {
         <button disabled={isSubmitting} className="btn-primary">
           {isSubmitting ? 'Envoi...' : 'Attester mon coupon'}
         </button>
-        <button type="button" onClick={() => reset({
-          type,
-          civility: 'Monsieur', lastName: '', firstName: '', email: '', phone: '', country: 'France', hideCodes: false,
-          coupons: [{ code: '', amount: '' }], numCoupons: 1,
-        })} className="btn-secondary">Effacer</button>
       </div>
     </form>
   )
