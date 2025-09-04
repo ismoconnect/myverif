@@ -1,8 +1,12 @@
 import { Link, NavLink } from 'react-router-dom'
+import { useState } from 'react'
 import { mainServices, giftCards } from '../constants/services'
 
 export default function Layout({ children }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navLinkClass = ({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`
+  
+  const closeMobileMenu = () => setIsMobileMenuOpen(false)
   return (
     <div className="min-h-full flex flex-col">
       <header className="fixed inset-x-0 top-0 z-40 bg-white/80 backdrop-blur border-b">
@@ -51,34 +55,39 @@ export default function Layout({ children }) {
               </div>
             </div>
           </nav>
-          <details className="md:hidden">
-            <summary className="list-none px-3 py-2 rounded-md text-sm font-medium bg-orange-500 text-black hover:bg-orange-600 cursor-pointer">
+          <div className="md:hidden">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="list-none px-3 py-2 rounded-md text-sm font-medium bg-orange-500 text-black hover:bg-orange-600 cursor-pointer"
+            >
               <span className="inline-flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
                 <span className="sr-only">Menu</span>
               </span>
-            </summary>
-            <div className="absolute right-4 mt-2 bg-white rounded-lg shadow-xl ring-1 ring-gray-100 min-w-[240px] z-10 p-2 space-y-1">
-              <NavLink to="/" className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Accueil</NavLink>
-              <NavLink to="/service" className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Service</NavLink>
-              <NavLink to="/contact" className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Contact</NavLink>
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes coupons</div>
-              {['toneofirst','transcash','pcs','neosurf','paysafecard']
-                .map(slug => mainServices.find(s => s.slug === slug))
-                .filter(Boolean)
-                .map(s => (
-                  <NavLink key={s.slug} to={`/attester/${s.slug}`} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
-                    Attester {s.name}
+            </button>
+            {isMobileMenuOpen && (
+              <div className="absolute right-4 mt-2 bg-white rounded-lg shadow-xl ring-1 ring-gray-100 min-w-[240px] z-10 p-2 space-y-1">
+                <NavLink to="/" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Accueil</NavLink>
+                <NavLink to="/service" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Service</NavLink>
+                <NavLink to="/contact" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Contact</NavLink>
+                <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes coupons</div>
+                {['toneofirst','transcash','pcs','neosurf','paysafecard']
+                  .map(slug => mainServices.find(s => s.slug === slug))
+                  .filter(Boolean)
+                  .map(s => (
+                    <NavLink key={s.slug} to={`/attester/${s.slug}`} onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
+                      Attester {s.name}
+                    </NavLink>
+                ))}
+                <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes cartes cadeaux</div>
+                {giftCards.map(g => (
+                  <NavLink key={g.slug} to={`/attester/${g.slug}`} onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
+                    Attester {g.name}
                   </NavLink>
-              ))}
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes cartes cadeaux</div>
-              {giftCards.map(g => (
-                <NavLink key={g.slug} to={`/attester/${g.slug}`} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
-                  Attester {g.name}
-                </NavLink>
-              ))}
-            </div>
-          </details>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </header>
       <main className="flex-1 pt-16">
