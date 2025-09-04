@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { mainServices, giftCards } from '../constants/services'
 
 export default function Layout({ children }) {
@@ -14,6 +14,11 @@ export default function Layout({ children }) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 100)
   }
+
+  // Scroll vers le haut de la page à chaque changement de route ou actualisation
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
   return (
     <div className="min-h-full flex flex-col">
       <header className="fixed inset-x-0 top-0 z-40 bg-white/80 backdrop-blur border-b">
