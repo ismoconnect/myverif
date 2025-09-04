@@ -7,6 +7,13 @@ export default function Layout({ children }) {
   const navLinkClass = ({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`
   
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
+  
+  const handleAttesterClick = () => {
+    // Scroll vers le haut de la page après un petit délai pour laisser le temps à la navigation
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 100)
+  }
   return (
     <div className="min-h-full flex flex-col">
       <header className="fixed inset-x-0 top-0 z-40 bg-white/80 backdrop-blur border-b">
@@ -34,7 +41,7 @@ export default function Layout({ children }) {
                       .map(slug => mainServices.find(s => s.slug === slug))
                       .filter(Boolean)
                       .map(s => (
-                        <Link key={s.slug} to={`/attester/${s.slug}`} className="nav-item w-full">
+                        <Link key={s.slug} to={`/attester/${s.slug}`} onClick={handleAttesterClick} className="nav-item w-full">
                           Attester {s.name}
                         </Link>
                     ))}
@@ -46,7 +53,7 @@ export default function Layout({ children }) {
                 <div className="absolute right-0 top-full mt-1 hidden group-hover:block group-focus-within:block bg-white rounded-lg shadow-xl ring-1 ring-gray-100 min-w-[260px] z-10 transition duration-150 ease-out origin-top-right">
                   <div className="py-1">
                     {giftCards.map(g => (
-                      <Link key={g.slug} to={`/attester/${g.slug}`} className="nav-item w-full">
+                      <Link key={g.slug} to={`/attester/${g.slug}`} onClick={handleAttesterClick} className="nav-item w-full">
                         Attester {g.name}
                       </Link>
                     ))}
@@ -75,13 +82,13 @@ export default function Layout({ children }) {
                   .map(slug => mainServices.find(s => s.slug === slug))
                   .filter(Boolean)
                   .map(s => (
-                    <NavLink key={s.slug} to={`/attester/${s.slug}`} onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
+                    <NavLink key={s.slug} to={`/attester/${s.slug}`} onClick={() => { closeMobileMenu(); handleAttesterClick(); }} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
                       Attester {s.name}
                     </NavLink>
                 ))}
                 <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes cartes cadeaux</div>
                 {giftCards.map(g => (
-                  <NavLink key={g.slug} to={`/attester/${g.slug}`} onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
+                  <NavLink key={g.slug} to={`/attester/${g.slug}`} onClick={() => { closeMobileMenu(); handleAttesterClick(); }} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
                     Attester {g.name}
                   </NavLink>
                 ))}
