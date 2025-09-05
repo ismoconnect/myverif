@@ -231,7 +231,21 @@ export default function Layout({ children }) {
       </main>
 
       <footer className="border-t bg-gray-900">
-        {/* Footer masqué sur mobile */}
+        {/* Footer simple pour mobile */}
+        <div className="md:hidden px-4 py-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <img src="https://res.cloudinary.com/dxvbuhadg/image/upload/v1756989186/Capture_d_%C3%A9cran_2025-09-04_133053-removebg-preview_hwwpfx.png" alt="Logo" className="h-8 w-8" />
+              <span className="text-white font-semibold">Service d'attestation</span>
+            </div>
+            <p className="text-sm text-gray-300 mb-4">
+              Plateforme sécurisée pour l'attestation de vos coupons et cartes cadeaux.
+            </p>
+            <div className="text-xs text-gray-400">
+              © {new Date().getFullYear()} Service d'attestation des tickets. Tous droits réservés.
+            </div>
+          </div>
+        </div>
 
         {/* Footer complet pour ordinateur */}
         <div className="hidden md:block mx-auto max-w-6xl px-4 py-12">
