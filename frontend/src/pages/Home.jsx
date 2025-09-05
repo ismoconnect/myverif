@@ -49,6 +49,34 @@ export default function Home() {
           />
         ))}
       </section>
+
+      {/* Section Comment ça marche */}
+      <section className="mt-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Comment ça marche ?</h2>
+          <p className="text-lg text-gray-600">Un processus simple en 3 étapes pour attester vos coupons</p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold">1</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Sélectionnez votre service</h3>
+            <p className="text-gray-600">Choisissez le type de coupon ou carte cadeau que vous souhaitez attester parmi nos services disponibles</p>
+          </div>
+          
+          <div className="text-center">
+            <div className="w-20 h-20 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold">2</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Remplissez le formulaire</h3>
+            <p className="text-gray-600">Entrez vos informations personnelles et les codes de vos coupons. Vous pouvez traiter jusqu'à 30 coupons en une fois</p>
+          </div>
+          
+          <div className="text-center">
+            <div className="w-20 h-20 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold">3</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Recevez votre attestation</h3>
+            <p className="text-gray-600">Notre équipe vérifie et valide vos coupons. Vous recevez votre attestation en quelques minutes</p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

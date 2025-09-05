@@ -18,8 +18,6 @@ export default function Attester() {
   if (!service) return <Navigate to="/" replace />
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold mb-2">Attester ({service.name})</h1>
-      <p className="text-gray-600 mb-4">{service.description || 'Carte cadeau'}</p>
       <div ref={formRef}>
         <CouponForm type={service.name} />
       </div>
