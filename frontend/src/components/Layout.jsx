@@ -6,7 +6,9 @@ export default function Layout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navLinkClass = ({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`
   
-  const closeMobileMenu = () => setIsMobileMenuOpen(false)
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false)
+  }
   
   const handleAttesterClick = () => {
     // Scroll vers le haut de la page après un petit délai pour laisser le temps à la navigation
@@ -15,10 +17,32 @@ export default function Layout({ children }) {
     }, 100)
   }
 
+  // Fermer le menu mobile quand on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        closeMobileMenu()
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('click', handleClickOutside)
+      document.body.style.overflow = 'hidden' // Empêcher le scroll du body
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
+
   // Scroll vers le haut de la page à chaque changement de route ou actualisation
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
+
   return (
     <div className="min-h-full flex flex-col">
       <header className="fixed inset-x-0 top-0 z-40 bg-white/80 backdrop-blur border-b">
@@ -68,63 +92,146 @@ export default function Layout({ children }) {
               </div>
             </div>
           </nav>
-          <div className="md:hidden">
+
+          {/* Menu mobile moderne */}
+          <div className="md:hidden mobile-menu-container">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="list-none px-3 py-2 rounded-md text-sm font-medium bg-orange-500 text-black hover:bg-orange-600 cursor-pointer"
+              className="relative z-50 p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-all duration-200 shadow-lg"
+              aria-label="Menu"
             >
-              <span className="inline-flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
-                <span className="sr-only">Menu</span>
-              </span>
-            </button>
-            {isMobileMenuOpen && (
-              <div className="absolute right-4 mt-2 bg-white rounded-lg shadow-xl ring-1 ring-gray-100 min-w-[240px] z-10 p-2 space-y-1">
-                <NavLink to="/" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Accueil</NavLink>
-                <NavLink to="/service" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Service</NavLink>
-                <NavLink to="/contact" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Contact</NavLink>
-                <NavLink to="/tracking" onClick={closeMobileMenu} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>Suivi</NavLink>
-                <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes coupons</div>
-                {['toneofirst','transcash','pcs','neosurf','paysafecard']
-                  .map(slug => mainServices.find(s => s.slug === slug))
-                  .filter(Boolean)
-                  .map(s => (
-                    <NavLink key={s.slug} to={`/attester/${s.slug}`} onClick={() => { closeMobileMenu(); handleAttesterClick(); }} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
-                      Attester {s.name}
-                    </NavLink>
-                ))}
-                <div className="px-3 py-1 text-xs font-semibold uppercase text-gray-500">Attester mes cartes cadeaux</div>
-                {giftCards.map(g => (
-                  <NavLink key={g.slug} to={`/attester/${g.slug}`} onClick={() => { closeMobileMenu(); handleAttesterClick(); }} className={({isActive}) => `nav-item w-full ${isActive ? 'nav-item-active' : ''}`}>
-                    Attester {g.name}
-                  </NavLink>
-                ))}
+              <div className="w-6 h-6 flex flex-col justify-center items-center">
+                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1' : '-translate-y-1'}`}></span>
+                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
+                <span className={`block w-5 h-0.5 bg-white transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'}`}></span>
               </div>
+            </button>
+
+            {/* Overlay */}
+            {isMobileMenuOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"></div>
             )}
+
+            {/* Menu mobile */}
+            <div className={`fixed top-16 right-0 h-[calc(100vh-4rem)] w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+              {/* Header du menu */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-orange-500">
+                <span className="text-white font-semibold">Menu</span>
+                <button 
+                  onClick={closeMobileMenu}
+                  className="p-1 rounded-full text-white hover:bg-white hover:bg-opacity-20 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Contenu du menu */}
+              <div className="h-full overflow-y-auto bg-white">
+                <div className="p-4 space-y-2">
+                  <NavLink 
+                    to="/" 
+                    onClick={closeMobileMenu} 
+                    className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Accueil
+                  </NavLink>
+                  
+                  <NavLink 
+                    to="/service" 
+                    onClick={closeMobileMenu} 
+                    className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Services
+                  </NavLink>
+                  
+                  <NavLink 
+                    to="/contact" 
+                    onClick={closeMobileMenu} 
+                    className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Contact
+                  </NavLink>
+                  
+                  <NavLink 
+                    to="/tracking" 
+                    onClick={closeMobileMenu} 
+                    className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    Suivi
+                  </NavLink>
+
+                  {/* Séparateur */}
+                  <div className="px-4 py-2">
+                    <div className="border-t border-gray-200"></div>
+                  </div>
+
+                  {/* Section Attester mes coupons - liens directs */}
+                  <div>
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 uppercase">Attester mes coupons</div>
+                    {['toneofirst','transcash','pcs','neosurf','paysafecard']
+                      .map(slug => mainServices.find(s => s.slug === slug))
+                      .filter(Boolean)
+                      .map(s => (
+                        <NavLink 
+                          key={s.slug} 
+                          to={`/attester/${s.slug}`} 
+                          onClick={() => { closeMobileMenu(); handleAttesterClick(); }} 
+                          className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                          </svg>
+                          Attester {s.name}
+                        </NavLink>
+                    ))}
+                  </div>
+
+                  {/* Section Attester mes cartes cadeaux - liens directs */}
+                  <div>
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-500 uppercase">Attester mes cartes cadeaux</div>
+                    {giftCards.map(g => (
+                      <NavLink 
+                        key={g.slug} 
+                        to={`/attester/${g.slug}`} 
+                        onClick={() => { closeMobileMenu(); handleAttesterClick(); }} 
+                        className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : ''}`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                        Attester {g.name}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
+
       <main className="flex-1 pt-16">
         <div className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
+
       <footer className="border-t bg-gray-900">
-        {/* Footer simple pour mobile */}
-        <div className="md:hidden px-4 py-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <img src="https://res.cloudinary.com/dxvbuhadg/image/upload/v1756989186/Capture_d_%C3%A9cran_2025-09-04_133053-removebg-preview_hwwpfx.png" alt="Logo" className="h-8 w-8" />
-              <span className="text-sm font-semibold text-white">Service d'attestation</span>
-            </div>
-            <p className="text-xs text-gray-300 mb-3">© {new Date().getFullYear()} Tous droits réservés</p>
-            <div className="flex justify-center space-x-4 text-xs">
-              <Link to="/contact" onClick={handleAttesterClick} className="text-gray-300 hover:text-orange-400 transition-colors">Contact</Link>
-              <Link to="/tracking" onClick={handleAttesterClick} className="text-gray-300 hover:text-orange-400 transition-colors">Suivi</Link>
-              <a href="mailto:support@attestation-coupons.com" className="text-gray-300 hover:text-orange-400 transition-colors">Support</a>
-            </div>
-          </div>
-        </div>
+        {/* Footer masqué sur mobile */}
 
         {/* Footer complet pour ordinateur */}
         <div className="hidden md:block mx-auto max-w-6xl px-4 py-12">
@@ -216,5 +323,3 @@ export default function Layout({ children }) {
     </div>
   )
 }
-
-
