@@ -62,11 +62,13 @@ export default function CouponForm({ type }) {
       // Afficher la boîte de dialogue de traitement
       setShowProcessingDialog(true)
       
+      console.log('Données du formulaire:', values)
+      
       // Utiliser le service Firestore pour enregistrer
       const result = await FirestoreService.submitCouponSubmission(values)
       
       if (result.success) {
-        console.log('Soumission enregistrée avec succès')
+        console.log('Soumission enregistrée avec succès:', result)
         
         // Simuler un délai de traitement (2 secondes)
         setTimeout(() => {
@@ -76,13 +78,35 @@ export default function CouponForm({ type }) {
           navigate(`/tracking/${result.referenceNumber}`)
         }, 2000)
       } else {
-        throw new Error(result.error)
+        throw new Error(result.error || 'Erreur inconnue lors de l\'enregistrement')
       }
       
     } catch (err) {
       setShowProcessingDialog(false)
-      console.error('Erreur lors de l\'enregistrement')
-      toast.error('Erreur lors de l\'enregistrement de votre demande')
+      console.error('Erreur détaillée lors de l\'enregistrement:', err)
+      
+      // Message d'erreur plus spécifique
+      let errorMessage = 'Erreur lors de l\'enregistrement de votre demande'
+      
+      if (err.message) {
+        errorMessage = err.message
+      } else if (err.code) {
+        switch (err.code) {
+          case 'permission-denied':
+            errorMessage = 'Erreur de permissions. Vérifiez la configuration Firebase.'
+            break
+          case 'unavailable':
+            errorMessage = 'Service temporairement indisponible. Réessayez plus tard.'
+            break
+          case 'unauthenticated':
+            errorMessage = 'Erreur d\'authentification. Vérifiez la configuration.'
+            break
+          default:
+            errorMessage = `Erreur Firebase: ${err.code}`
+        }
+      }
+      
+      toast.error(errorMessage)
     }
   }
 
