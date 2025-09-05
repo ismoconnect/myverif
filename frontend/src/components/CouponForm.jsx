@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { euCountries } from '../constants/euCountries'
 import { useNavigate } from 'react-router-dom'
 import { FirestoreService } from '../services/firestoreService'
+import { validateCouponCode, getCouponCodeErrorMessage, validateEmail, couponCodeLengths } from '../utils/validators'
 
 export default function CouponForm({ type }) {
   const [showProcessingDialog, setShowProcessingDialog] = useState(false)
@@ -25,6 +26,18 @@ export default function CouponForm({ type }) {
   const { fields, append, remove } = useFieldArray({ control, name: 'coupons' })
   const numCoupons = watch('numCoupons')
   const hideCodes = watch('hideCodes')
+
+  // Fonction pour convertir le code en majuscules
+  const handleCodeChange = (index, value) => {
+    const upperValue = value.toUpperCase()
+    setValue(`coupons.${index}.code`, upperValue)
+  }
+
+  // Fonction pour obtenir le nombre de caractères restants
+  const getRemainingChars = (currentValue) => {
+    const maxLength = couponCodeLengths[type.toLowerCase()] || 10
+    return maxLength - (currentValue?.length || 0)
+  }
 
   // Ensure number of coupon boxes matches numCoupons
   useEffect(() => {
@@ -139,12 +152,16 @@ export default function CouponForm({ type }) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="sm:col-span-2">
               <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2 text-gray-700">Email *</label>
-              <input className="w-full rounded-lg border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-center focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 bg-white" type="email" placeholder="votre@email.com" {...register('email', { required: true, maxLength: 128 })} />
+              <input className="w-full rounded-lg border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-center focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 bg-white" type="email" placeholder="votre@email.com" {...register('email', { 
+                required: true, 
+                maxLength: 128,
+                validate: validateEmail
+              })} />
               {errors.email && <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center">
                 <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                Email requis
+                {errors.email.message || 'Email requis'}
               </p>}
             </div>
             <div>
@@ -218,13 +235,40 @@ export default function CouponForm({ type }) {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2 text-gray-700">Code coupon *</label>
-                    <input className="w-full rounded-lg border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-center focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 bg-white font-mono" type={hideCodes ? 'password' : 'text'} autoComplete="off" placeholder="Entrez le code" {...register(`coupons.${index}.code`, { required: true, minLength: 4 })} />
+                    <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2 text-gray-700">
+                      Code coupon * 
+                      <span className="text-orange-600 font-normal">
+                        ({couponCodeLengths[type.toLowerCase()] || 10} caractères)
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <input 
+                        className="w-full rounded-lg border-2 border-gray-200 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-center focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-200 bg-white font-mono uppercase" 
+                        type={hideCodes ? 'password' : 'text'} 
+                        autoComplete="off" 
+                        placeholder={`Entrez le code (${couponCodeLengths[type.toLowerCase()] || 10} caractères)`}
+                        maxLength={couponCodeLengths[type.toLowerCase()] || 10}
+                        onChange={(e) => handleCodeChange(index, e.target.value)}
+                        {...register(`coupons.${index}.code`, { 
+                          required: true,
+                          validate: (value) => {
+                            if (!value) return 'Code requis'
+                            if (!validateCouponCode(value, type)) {
+                              return getCouponCodeErrorMessage(type)
+                            }
+                            return true
+                          }
+                        })} 
+                      />
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+                        {getRemainingChars(watch(`coupons.${index}.code`))}
+                      </div>
+                    </div>
                     {errors.coupons?.[index]?.code && <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center">
                       <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
-                      Code requis (minimum 4 caractères)
+                      {errors.coupons[index].code.message}
                     </p>}
                   </div>
                   <div>
